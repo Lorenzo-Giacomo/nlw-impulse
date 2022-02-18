@@ -1,13 +1,26 @@
 import styles from './styles.module.scss'
 import { api } from '../../services/api'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import logoImg from '../../assets/LogoDoWhile.svg'
 
+// colocar apenas as tipagens que irão ser utilizadas na aplicação
+type Message = {
+  id: string;
+  text: string;
+  user: {
+    name: string;
+    avatar_url: string;
+  }
+}
+
 export function MessageList() {
+   // o estado armazenará uma lista de mensagens
+  const [messages, setMessages] = useState<Message[]>([])
+
   useEffect(() => {
     //similar ao await, executa depois.
-    api.get('messages').then(response => {
-      console.log(response.data)
+    api.get<Message[]>('messages/last3').then(response => {
+      setMessages(response.data)
     })
   }, [])
   
@@ -16,42 +29,19 @@ export function MessageList() {
       <img src={logoImg} alt="" />
 
       <ul className={styles.messageList}>
-        <li className={styles.message}>
-          <p className={styles.messageContent}>
-          Não vejo a hora de começar esse evento, com certeza vai ser o melhor de todos os tempos, vamooo pra cima! 🔥🔥
-          </p>
-          <div className={styles.messageUser}>
-            <div className={styles.userImage}>
-              <img src="https://github.com/lorenzo-giacomo.png" alt="" />
+        {messages.map(message => { // para cada message(no caso 3), irá incluir enviar colocar os conteúdos dentro das caixas {message.dadosDaReposta}
+          return (
+            <li key={message.id} className={styles.message}>
+            <p className={styles.messageContent}>{message.text}</p>
+            <div className={styles.messageUser}>
+              <div className={styles.userImage}>
+                <img src={message.user.avatar_url} alt={message.user.name} />
+              </div>
+              <span>{message.user.name}</span>
             </div>
-            <span>Lorenzo Giacomo</span>
-          </div>
-        </li>
-
-        <li className={styles.message}>
-          <p className={styles.messageContent}>
-          Não vejo a hora de começar esse evento, com certeza vai ser o melhor de todos os tempos, vamooo pra cima! 🔥🔥
-          </p>
-          <div className={styles.messageUser}>
-            <div className={styles.userImage}>
-              <img src="https://github.com/lorenzo-giacomo.png" alt="" />
-            </div>
-            <span>Lorenzo Giacomo</span>
-          </div>
-        </li>
-
-        <li className={styles.message}>
-          <p className={styles.messageContent}>
-          Não vejo a hora de começar esse evento, com certeza vai ser o melhor de todos os tempos, vamooo pra cima! 🔥🔥
-          </p>
-          <div className={styles.messageUser}>
-            <div className={styles.userImage}>
-              <img src="https://github.com/lorenzo-giacomo.png" alt="" />
-            </div>
-            <span>Lorenzo Giacomo</span>
-          </div>
-        </li>
-
+          </li>
+          )
+        })}
         </ul>
       </div>
   )
